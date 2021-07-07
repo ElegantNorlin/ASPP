@@ -1,2 +1,3 @@
 # ASPP
-A pytorch implementation of ASPP
+A pytorch implementation of ASPP modul.
+
