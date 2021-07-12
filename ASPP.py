@@ -1,5 +1,7 @@
+# in_channel是输入特征通道维度
+# depth是输出特征通道维度
 class ASPP(nn.Module):
-    def __init__(self, in_channel=512, depth=256):
+    def __init__(self, in_channel=512, depth=512):
         super(ASPP,self).__init__()
         # global average pooling : init nn.AdaptiveAvgPool2d ;also forward torch.mean(,,keep_dim=True)
         self.mean = nn.AdaptiveAvgPool2d((1, 1))
