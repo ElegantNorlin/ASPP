@@ -1,7 +1,13 @@
+from __future__ import division
+from torch.autograd import Variable
+import torch
+import torch.nn as nn
+import os
+
 # in_channel是输入特征通道维度
 # depth是输出特征通道维度
 class ASPP(nn.Module):
-    def __init__(self, in_channel=512, depth=512):
+    def __init__(self, in_channel, depth):
         super(ASPP,self).__init__()
         # global average pooling : init nn.AdaptiveAvgPool2d ;also forward torch.mean(,,keep_dim=True)
         self.mean = nn.AdaptiveAvgPool2d((1, 1))
@@ -32,3 +38,13 @@ class ASPP(nn.Module):
         net = self.conv_1x1_output(torch.cat([image_features, atrous_block1, atrous_block6,
                                               atrous_block12, atrous_block18], dim=1))
         return net
+
+
+
+if __name__ == "__main__":
+    aspp = ASPP(3)
+    aspp.cuda()
+    # bs,channels,height,width
+    x = Variable(torch.rand([8, 3, 32, 32]).cuda())
+    y = aspp(x)
+
