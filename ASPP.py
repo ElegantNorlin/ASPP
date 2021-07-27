@@ -3,6 +3,7 @@ from torch.autograd import Variable
 import torch
 import torch.nn as nn
 import os
+import torch.nn.functional as F
 
 # in_channel是输入特征通道维度
 # depth是输出特征通道维度
@@ -22,19 +23,27 @@ class ASPP(nn.Module):
  
     def forward(self, x):
         size = x.shape[2:]
- 
+ 		# mean.shape = torch.Size([8, 3, 1, 1])
         image_features = self.mean(x)
+        # conv.shape = torch.Size([8, 3, 1, 1])
         image_features = self.conv(image_features)
+        # upsample.shape = torch.Size([8, 3, 32, 32])
         image_features = F.upsample(image_features, size=size, mode='bilinear')
- 
+ 		
+ 		# block1.shape = torch.Size([8, 3, 32, 32])
         atrous_block1 = self.atrous_block1(x)
- 
+ 		
+ 		# block6.shape = torch.Size([8, 3, 32, 32])
         atrous_block6 = self.atrous_block6(x)
- 
+ 		
+ 		# block12.shape = torch.Size([8, 3, 32, 32])
         atrous_block12 = self.atrous_block12(x)
- 
+ 		
+ 		# block18.shape = torch.Size([8, 3, 32, 32])
         atrous_block18 = self.atrous_block18(x)
- 
+ 		
+ 		# torch.cat.shape = torch.Size([8, 15, 32, 32])
+ 		# conv_1x1.shape = torch.Size([8, 3, 32, 32])
         net = self.conv_1x1_output(torch.cat([image_features, atrous_block1, atrous_block6,
                                               atrous_block12, atrous_block18], dim=1))
         return net
@@ -42,7 +51,7 @@ class ASPP(nn.Module):
 
 
 if __name__ == "__main__":
-    aspp = ASPP(3)
+    aspp = ASPP(3,3)
     aspp.cuda()
     # bs,channels,height,width
     x = Variable(torch.rand([8, 3, 32, 32]).cuda())
